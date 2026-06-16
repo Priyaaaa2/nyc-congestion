@@ -1,0 +1,10 @@
+duckdb
+polars
+geopandas
+pandas
+matplotlib
+scipy
+statsmodels
+requests
+pyarrow
+openpyxl
