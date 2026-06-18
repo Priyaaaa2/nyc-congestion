@@ -17,3 +17,17 @@ CRZ_ZONES = [
 TREATMENT_DATE = "2025-01-05"
 LYFT_CREDIT_START = "2025-01-01"
 LYFT_CREDIT_END = "2025-01-31"
+
+# --- paths ---
+TLC_FHVHV_DIR  = DATA_RAW + "tlc/fhvhv/"
+TLC_YELLOW_DIR = DATA_RAW + "tlc/yellow/"
+TLC_ZONES_SHP  = DATA_RAW + "tlc/taxi_zones/taxi_zones/taxi_zones.shp"
+TLC_ZONE_CSV   = DATA_RAW + "tlc/zone_lookup.csv"
+MTA_FULL       = DATA_RAW + "mta/subway_full.parquet"
+MTA_STATIONS   = DATA_RAW + "mta/stations.csv"
+CENSUS_INCOME  = DATA_RAW + "census/income_zcta_clean.csv"
+CENSUS_COMMUTE = DATA_RAW + "census/commute_zcta_clean.csv"
+CENSUS_ZCTA    = DATA_RAW + "census/zcta_shapefile/tl_2023_us_zcta520.shp"
+WEATHER        = DATA_RAW + "weather/central_park.csv"
+DOT_2024       = DATA_RAW + "dot/speeds_jan2024.parquet"
+DOT_2025       = DATA_RAW + "dot/speeds_jan2025.parquet"
