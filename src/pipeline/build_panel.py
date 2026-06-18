@@ -17,10 +17,6 @@ WEATHER_CSV = pathlib.Path(config.WEATHER)
 
 
 def build_trip_panel(con) -> pd.DataFrame:
-    """
-    Aggregate raw trips to zone x week x vehicle_type.
-    Runs entirely in DuckDB — never loads 509M rows into memory.
-    """
     print("\nAggregating trips to zone × week × vehicle_type...")
     print("  (DuckDB scans 509M rows on disk — takes 3-5 min)")
 
