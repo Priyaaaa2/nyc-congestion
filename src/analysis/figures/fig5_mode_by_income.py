@@ -1,9 +1,3 @@
-"""
-src/analysis/figures/fig5_mode_by_income.py
-Figure 5 — Income quintile x mode shift stacked bar chart
-Run: python -m src.analysis.figures.fig5_mode_by_income
-"""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -51,7 +45,6 @@ def main():
     fig, axes = plt.subplots(1, 2, figsize=(13, 6),
                               gridspec_kw={"width_ratios": [2, 1]})
 
-    # ── LEFT: stacked bar ─────────────────────────────────
     ax = axes[0]
     b1 = ax.bar(x, subway,   width=w, color="#378ADD",
                 label="→ Subway",      zorder=3)
@@ -62,7 +55,6 @@ def main():
                 bottom=subway + yellow,
                 label="→ Suppressed demand", zorder=3)
 
-    # Value labels inside bars
     for i, (s, y_, sp) in enumerate(zip(subway, yellow, suppress)):
         if s > 5:
             ax.text(i, s / 2, f"{s:.0f}%",
@@ -77,7 +69,6 @@ def main():
                     ha="center", va="center", fontsize=8.5,
                     color="white", fontweight="500")
 
-    # Annotate trip loss below bars
     for i, row in summary.iterrows():
         ax.text(i, -6, f"{row['effect_pct']:.1f}%",
                 ha="center", va="top", fontsize=8,
@@ -99,7 +90,6 @@ def main():
     ax.tick_params(labelsize=9)
     ax.axhline(0, color="#888780", linewidth=0.6)
 
-    # ── RIGHT: suppressed demand highlight ───────────────
     ax2 = axes[1]
     synth["has_sub"] = synth["has_subway"].astype(int)
     groups = synth.groupby("has_sub")["suppressed_pct"].mean()
@@ -118,7 +108,6 @@ def main():
                  ha="center", va="bottom",
                  fontsize=11, fontweight="500")
 
-    # 59pp gap annotation
     y1 = groups.get(1, 0)
     y2 = groups.get(0, 0)
     ax2.annotate("",

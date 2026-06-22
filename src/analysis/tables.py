@@ -14,10 +14,6 @@ OUT_DIR = pathlib.Path(config.OUTPUTS)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# ============================================================
-# HELPERS
-# ============================================================
-
 def tex_escape(s: str) -> str:
     """Escape special LaTeX characters."""
     return (str(s)
@@ -46,11 +42,6 @@ def booktabs_wrap(title: str, label: str,
 {fn}\\end{{tabular}}
 \\end{{table}}
 """
-
-
-# ============================================================
-# TABLE 1 — Data sources
-# ============================================================
 
 def make_table1():
     print("Building Table 1 — Data sources...")
@@ -125,18 +116,12 @@ def make_table1():
     print(f"  Saved -> {out}")
     return tex
 
-
-# ============================================================
-# TABLE 2 — Descriptive statistics
-# ============================================================
-
 def make_table2():
     print("Building Table 2 — Descriptive statistics...")
 
     panel = pd.read_parquet(PROC / "master_panel.parquet")
     panel["week_start"] = pd.to_datetime(panel["week_start"])
 
-    # CRZ FHVHV only
     fhvhv = panel[
         (panel["vehicle_type"] == "fhvhv") &
         (panel["in_crz"] == 1)
@@ -178,7 +163,7 @@ def make_table2():
         label   = row[1]
         fmt     = row[2]
         tfm     = row[4] if len(row) > 4 else None
-        # handle lambda in position 3
+
         if len(row) == 4 and callable(row[3]):
             tfm = row[3]
 
@@ -230,14 +215,9 @@ def make_table2():
     return tex
 
 
-# ============================================================
-# TABLE 3 — Regression results
-# ============================================================
-
 def make_table3():
     print("Building Table 3 — Regression results...")
 
-    # ── Phase 2: Equity OLS ───────────────────────────────
     panel  = pd.read_parquet(PROC / "master_panel.parquet")
     panel["week_start"] = pd.to_datetime(panel["week_start"])
     income = pd.read_csv(PROC / "zone_income.csv")
@@ -252,7 +232,6 @@ def make_table3():
         data=equity.dropna(subset=["median_income", "effect_pct"])
     ).fit(cov_type="HC3")
 
-    # ── Phase 4: DiD ──────────────────────────────────────
     did_path = PROC / "phase4/platform_weekly.parquet"
     did_df   = pd.read_parquet(did_path)
     did_df["week_start"] = pd.to_datetime(did_df["week_start"])
@@ -267,7 +246,6 @@ def make_table3():
         data=did_df
     ).fit(cov_type="HC3")
 
-    # ── Format regression table ───────────────────────────
     def stars(p):
         if p < 0.001: return "^{***}"
         if p < 0.01:  return "^{**}"
@@ -291,10 +269,8 @@ def make_table3():
         "\\midrule"
     )
 
-    # Column 1 = Equity OLS (m2), Column 2 = DiD (m4)
-    # Rows: equity vars first, then DiD-specific vars
     all_vars = [
-        # (display label, m2_key, m4_key)
+
         ("log(Median income)",               "log_income", None),
         ("Has subway (0/1)",                 "has_subway",  None),
         ("DiD ($\\tau$: Lyft $\\times$ Post)", None,       "did"),
@@ -306,8 +282,8 @@ def make_table3():
     body = header_row + "\n"
 
     for label, k2, k4 in all_vars:
-        c1 = ""   # equity OLS
-        c2 = ""   # DiD
+        c1 = ""   
+        c2 = "" 
 
         if k2 and k2 in m2.params:
             s  = stars(m2.pvalues[k2])
@@ -318,7 +294,6 @@ def make_table3():
 
         body += f"{label} & {c1} & {c2} \\\\\n"
 
-        # SE row
         se1 = f"$({m2.bse[k2]:.3f})$" if k2 and k2 in m2.bse else ""
         se2 = f"$({m4.bse[k4]:.3f})$" if k4 and k4 in m4.bse else ""
         body += f" & {se1} & {se2} \\\\\n"
@@ -355,11 +330,6 @@ def make_table3():
     print(f"  Saved -> {out}")
     return tex
 
-
-# ============================================================
-# MAIN
-# ============================================================
-
 def main():
     print("\n" + "="*55)
     print("  PHASE B: LATEX TABLES")
@@ -376,7 +346,6 @@ def main():
     print(f"  table3_regressions.tex")
     print(f"{'='*55}\n")
 
-    # Print preview of each
     for name, tex in [("Table 1", t1), ("Table 2", t2), ("Table 3", t3)]:
         print(f"\n{'─'*50}")
         print(f"  {name} preview (first 8 lines):")

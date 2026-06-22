@@ -16,7 +16,6 @@ PANEL_PATH = pathlib.Path(config.DATA_PROC) / "master_panel.parquet"
 OUT_DIR    = pathlib.Path(config.DATA_PROC) / "phase4"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
  
-# Platform license numbers
 LYFT_LIC = "HV0005"
 UBER_LIC = "HV0003"
  
@@ -33,9 +32,8 @@ def load_platform_weekly() -> pd.DataFrame:
     import duckdb
     con = duckdb.connect()
  
-    # Files: 2023 (pre-trend), 2024 (pre-treatment), 2025 (post)
     files = sorted(FHVHV_DIR.glob("*.parquet"))
-    # Filter to 2023 onwards
+
     files = [f for f in files if any(
         f.name.startswith(f"fhvhv_tripdata_{y}")
         for y in ["2023","2024","2025"]
@@ -72,15 +70,14 @@ def load_platform_weekly() -> pd.DataFrame:
     con.close()
  
     df["week_start"] = pd.to_datetime(df["week_start"])
-    # Drop partial last week
+
     df = df[df["week_start"] < "2025-06-30"]
-    # Lyft and Uber only
+
     df = df[df["platform"].isin(["lyft","uber"])]
  
     print(f"  Rows: {len(df):,}")
     print(f"  Weeks: {df['week_start'].nunique()}")
  
-    # Show Jan 2025 split
     jan25 = df[
         (df["week_start"] >= "2025-01-01") &
         (df["week_start"] <  "2025-02-01")
@@ -109,7 +106,6 @@ def test_parallel_trends(df: pd.DataFrame) -> float:
         print("  Not enough pre-period data")
         return np.nan
  
-    # Week-over-week correlation
     wide["lyft_chg"] = wide["lyft"].pct_change()
     wide["uber_chg"] = wide["uber"].pct_change()
     wide = wide.dropna()
@@ -124,15 +120,13 @@ def test_parallel_trends(df: pd.DataFrame) -> float:
     else:
         print(f"  ❌ Weak parallel trends — interpret with caution")
  
-    # Trend comparison
     wide["week_num"] = range(len(wide))
     lyft_trend = np.polyfit(wide["week_num"], wide["lyft"], 1)[0]
     uber_trend = np.polyfit(wide["week_num"], wide["uber"], 1)[0]
     print(f"\n  Pre-period weekly trend:")
     print(f"    Lyft: {lyft_trend:+.0f} trips/week")
     print(f"    Uber: {uber_trend:+.0f} trips/week")
- 
-    # Print weekly pre-period table
+
     print(f"\n  {'Week':<12} {'Lyft':>10} {'Uber':>10} {'Ratio':>8}")
     print(f"  {'-'*42}")
     for _, row in wide.sort_values("week_start").tail(12).iterrows():
@@ -162,8 +156,7 @@ def run_did(df: pd.DataFrame):
     df["week_num"] = (
         (df["week_start"] - df["week_start"].min()).dt.days // 7
     )
- 
-    # Lyft credit period flag
+
     df["lyft_credit"] = (
         (df["week_start"] >= config.LYFT_CREDIT_START) &
         (df["week_start"] <= config.LYFT_CREDIT_END) &
@@ -175,7 +168,6 @@ def run_did(df: pd.DataFrame):
         weeks=("count"), avg_trips=("mean")
     ).round(0).to_string())
  
-    # Main DiD
     formula = "log_trips ~ did + is_lyft + post + C(month)"
     model   = smf.ols(formula, data=df).fit(cov_type="HC3")
  
@@ -207,7 +199,6 @@ def compute_elasticity(tau: float, tau_se: float) -> tuple:
     print("  PRICE ELASTICITY OF DEMAND")
     print("="*55)
  
-    # Average pre-treatment CRZ FHVHV fare from panel
     panel = pd.read_parquet(PANEL_PATH)
     pre   = panel[
         (panel["vehicle_type"] == "fhvhv") &
@@ -217,8 +208,8 @@ def compute_elasticity(tau: float, tau_se: float) -> tuple:
     avg_fare = pre["avg_fare"].mean()
  
     subsidy       = 1.50
-    price_control = avg_fare             # Uber: full fare
-    price_treated = avg_fare - subsidy   # Lyft: fare - credit
+    price_control = avg_fare             
+    price_treated = avg_fare - subsidy   
  
     delta_log_p   = np.log(price_control / price_treated)
  
@@ -275,7 +266,6 @@ def main():
     model, tau, se = run_did(df)
     elas, lo, hi   = compute_elasticity(tau, se)
  
-    # Save
     results = pd.DataFrame([{
         "tau_did":          tau,
         "tau_se":           se,
@@ -286,8 +276,7 @@ def main():
         "parallel_corr":    corr,
     }])
     results.to_parquet(OUT_DIR / "did_results.parquet", index=False)
- 
-    # Save weekly platform data for parallel trends chart
+
     df.to_parquet(OUT_DIR / "platform_weekly.parquet", index=False)
  
     print(f"\n{'='*55}")

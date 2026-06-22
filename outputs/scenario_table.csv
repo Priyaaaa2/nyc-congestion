@@ -1,0 +1,10 @@
+Scenario,Year,Trips_M,Revenue_M,Revenue_M_2x_elast,Avg_toll
+A — \$9 flat (HVFHV \$1.50),2025,92.5,138.8,138.8,1.5
+A — \$9 flat (HVFHV \$1.50),2026,95.7,143.5,143.5,1.5
+A — \$9 flat (HVFHV \$1.50),2027,98.9,148.4,148.4,1.5
+B — Rise to \$15 in 2027 (HVFHV \$2.50),2025,92.5,138.8,138.8,1.5
+B — Rise to \$15 in 2027 (HVFHV \$2.50),2026,95.7,143.5,143.5,1.5
+B — Rise to \$15 in 2027 (HVFHV \$2.50),2027,15.4,38.4,-170.4,2.5
+C — 6-month pause Jul-Dec 2025,2025,151.6,68.8,68.8,0.8
+C — 6-month pause Jul-Dec 2025,2026,95.7,143.5,143.5,1.5
+C — 6-month pause Jul-Dec 2025,2027,98.9,148.4,148.4,1.5

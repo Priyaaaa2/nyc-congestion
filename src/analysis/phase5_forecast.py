@@ -13,21 +13,15 @@ PHASE1_PATH  = pathlib.Path(config.DATA_PROC) / "phase1"
 OUT_DIR      = pathlib.Path(config.DATA_PROC) / "phase5"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
  
-# ── Key parameters ────────────────────────────────────────
-ELASTICITY_BASE  = -1.267   # Phase 1 implied (used for base case)
-ELASTICITY_2X    = -1.267 * 2  # Sensitivity test
+
+ELASTICITY_BASE  = -1.267 
+ELASTICITY_2X    = -1.267 * 2  
  
-BASELINE_GROWTH  = 0.034    # YoY FHVHV growth from Phase 1
- 
-# Average weekly CRZ HVFHV trips in 2024 (pre-treatment baseline)
-# Will be computed from panel
- 
-# MTA toll per HVFHV trip (charged to passenger)
-TOLL_HVFHV_BASE  = 1.50    # Current toll (Jan 2025 onwards)
-TOLL_HVFHV_HIGH  = (15/9) * 1.50  # If total toll rises to $15
-#                 = $2.50 (scaled proportionally)
- 
-# Weeks per year
+BASELINE_GROWTH  = 0.034
+
+TOLL_HVFHV_BASE  = 1.50    
+TOLL_HVFHV_HIGH  = (15/9) * 1.50
+
 WEEKS_PER_YEAR   = 52
  
  
@@ -47,7 +41,7 @@ def get_baseline_weekly_trips() -> float:
 def build_scenario(
     name: str,
     baseline_weekly: float,
-    toll_schedule: dict,   # {month_number: toll_amount}
+    toll_schedule: dict,   
     elasticity: float,
     n_months: int = 36
 ) -> pd.DataFrame:
@@ -61,30 +55,25 @@ def build_scenario(
     - Compute MTA revenue = trips × toll per trip
     """
     rows = []
-    base_toll = TOLL_HVFHV_BASE  # $1.50 reference
+    base_toll = TOLL_HVFHV_BASE  
  
     for month in range(1, n_months + 1):
-        # Calendar info
+        
         year   = 2025 + (month - 1) // 12
         month_of_year = ((month - 1) % 12) + 1
- 
-        # Toll this month
+
         toll = toll_schedule.get(month, TOLL_HVFHV_BASE)
  
-        # Organic growth: compound monthly from 2024 baseline
         monthly_growth = (1 + BASELINE_GROWTH) ** (month / 12)
         organic_trips_weekly = baseline_weekly * monthly_growth
- 
-        # Demand response to toll change
+
         pct_price_change = (toll - base_toll) / base_toll
         pct_demand_change = elasticity * pct_price_change
         adjusted_trips_weekly = organic_trips_weekly * \
                                 (1 + pct_demand_change)
- 
-        # Monthly trips (4.33 weeks per month)
+
         monthly_trips = adjusted_trips_weekly * (WEEKS_PER_YEAR / 12)
  
-        # MTA revenue from HVFHV toll
         mta_revenue = monthly_trips * toll
  
         rows.append({
@@ -111,14 +100,10 @@ def define_toll_schedules() -> dict:
     C: 6-month pause starting month 7 (Jul 2025),
        reinstated at $1.50 in month 13 (Jan 2026)
     """
-    # Scenario A: flat
     sched_a = {m: 1.50 for m in range(1, 37)}
- 
-    # Scenario B: rise to $2.50 in month 25 (Jan 2027)
+
     sched_b = {m: 1.50 for m in range(1, 25)}
     sched_b.update({m: TOLL_HVFHV_HIGH for m in range(25, 37)})
- 
-    # Scenario C: pause months 7-12, then reinstate
     sched_c = {m: 1.50 for m in range(1, 7)}
     sched_c.update({m: 0.00 for m in range(7, 13)})
     sched_c.update({m: 1.50 for m in range(13, 37)})
@@ -181,7 +166,6 @@ def print_scenario_comparison(base: pd.DataFrame,
     base_ann = annual_summary(base)
     sens_ann = annual_summary(sens)
  
-    # Rename sens scenarios to match base
     sens_ann["scenario"] = sens_ann["scenario"].str.replace("_2x","")
  
     merged = base_ann.merge(
@@ -210,7 +194,6 @@ def main():
     print("  PHASE 5: THREE-SCENARIO REVENUE FORECAST")
     print("="*55)
  
-    # ── Baseline ─────────────────────────────────────────
     baseline_weekly = get_baseline_weekly_trips()
     print(f"\n  2024 baseline weekly CRZ HVFHV trips: "
           f"{baseline_weekly:,.0f}")
@@ -218,15 +201,12 @@ def main():
           f"{ELASTICITY_BASE}")
     print(f"  Organic growth rate                  : "
           f"{BASELINE_GROWTH*100:.1f}% YoY")
- 
-    # ── Toll schedules ────────────────────────────────────
     schedules = define_toll_schedules()
     print(f"\n  Scenarios:")
     print(f"    A — $9 flat (HVFHV $1.50) for 36 months")
     print(f"    B — Rise to $15 in Jan 2027 (HVFHV $2.50)")
     print(f"    C — 6-month pause Jul-Dec 2025, then $9 restored")
- 
-    # ── Base case forecasts ───────────────────────────────
+
     print(f"\n  Running base case forecasts...")
     base_frames = []
     for name, sched in schedules.items():
@@ -236,11 +216,9 @@ def main():
         base_frames.append(df)
     base_all = pd.concat(base_frames, ignore_index=True)
  
-    # ── Sensitivity ───────────────────────────────────────
     print(f"  Running 2× elasticity sensitivity...")
     sens_all = run_sensitivity(baseline_weekly, schedules)
- 
-    # ── Annual summaries ──────────────────────────────────
+
     base_annual = annual_summary(base_all)
     sens_annual = annual_summary(sens_all)
  
@@ -250,25 +228,21 @@ def main():
     print_annual_table(base_annual, "Annual HVFHV trips and MTA revenue")
  
     print_scenario_comparison(base_all, sens_all)
- 
-    # ── Key findings ──────────────────────────────────────
+
     print("\n" + "="*55)
     print("  KEY FINDINGS")
     print("="*55)
  
-    # Scenario A year 3
     a3 = base_annual[
         (base_annual["scenario"]=="A_flat_9") &
         (base_annual["year"]==2027)
     ].iloc[0]
- 
-    # Scenario B year 3
+
     b3 = base_annual[
         (base_annual["scenario"]=="B_rise_15") &
         (base_annual["year"]==2027)
     ].iloc[0]
- 
-    # Scenario C year 1
+
     c1 = base_annual[
         (base_annual["scenario"]=="C_pause") &
         (base_annual["year"]==2025)
@@ -304,7 +278,6 @@ def main():
         f"{b3_cons['hvfhv_trips_M']:.1f}M trips, "
         f"${b3_cons['mta_revenue_M']:.0f}M revenue")
  
-    # ── Save ─────────────────────────────────────────────
     base_all.to_parquet(OUT_DIR / "forecast_base.parquet", index=False)
     sens_all.to_parquet(OUT_DIR / "forecast_2x.parquet",   index=False)
     base_annual.to_csv(OUT_DIR / "forecast_annual.csv",    index=False)

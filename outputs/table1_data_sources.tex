@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\caption{Data Sources}
+\label{tab:data}
+\small
+\begin{tabular}{llllrl}
+\toprule
+\textbf{Source} & \textbf{Provider} & \textbf{Period} & \textbf{Unit} & \textbf{N} & \textbf{Key variables} \\
+\midrule
+NYC TLC HVFHV & NYC Taxi \& Limousine Commission & Jan 2022 -- Jun 2025 & Trip & 378M & Platform ID, pickup zone, fare, timestamp \\
+NYC TLC Yellow Taxi & NYC Taxi \& Limousine Commission & Jan 2022 -- Jun 2025 & Trip & 131M & Pickup zone, fare, timestamp \\
+MTA Subway Ridership & MTA Open Data & Jan 2022 -- Jun 2025 & Station-hour & 93M & Station complex ID, ridership, transit mode \\
+Census ACS 5-Year & US Census Bureau & 2023 (2019--2023) & ZCTA & 1,610 & Median household income, commute mode shares \\
+NOAA GHCND & NOAA Climate Data & Jan 2022 -- Jun 2025 & Day & 1,278 & Max temp, precipitation, snow depth (Central Park) \\
+NYC DOT Speeds & NYC Open Data & Jan 2024, Jan 2025 & Segment-5min & $\sim$2M & Link speed, travel time, corridor ID \\
+
+\bottomrule
+\multicolumn{999}{l}{\footnotesize HVFHV = High-Volume For-Hire Vehicle (Uber, Lyft, Via). TLC zone shapefile (263 zones) used for spatial joins. ACS = American Community Survey.}\\
+\end{tabular}
+\end{table}

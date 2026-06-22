@@ -48,8 +48,7 @@ def make_choropleth(manhattan, map_df):
     print("Building choropleth...")
  
     fig, axes = plt.subplots(1, 2, figsize=(16, 14))
- 
-    # ── LEFT: Manhattan zone map ──────────────────────────
+
     ax1 = axes[0]
  
     map_df.plot(ax=ax1, color="#F0F0F0", edgecolor="#CCCCCC",
@@ -104,7 +103,6 @@ def make_choropleth(manhattan, map_df):
     ax1.legend(handles=handles, loc="lower left",
                fontsize=8.5, framealpha=0.9)
  
-    # ── RIGHT: Income vs trip loss scatter ────────────────
     ax2 = axes[1]
  
     crz_data = manhattan[
@@ -129,7 +127,6 @@ def make_choropleth(manhattan, map_df):
     ax2.scatter(x, y, c=colors, s=sizes, alpha=0.75,
                 edgecolors="white", linewidth=0.6, zorder=3)
  
-    # OLS line
     mask = x.notna() & y.notna()
     if mask.sum() > 5:
         z = np.polyfit(x[mask], y[mask], 1)
@@ -141,17 +138,14 @@ def make_choropleth(manhattan, map_df):
     ax2.axhline(0, color="#999999", linewidth=0.8,
                 linestyle=":", zorder=1)
  
-    # Set axis limits first so labels render in correct position
     ax2.set_xlim(35, 240)
     ax2.set_ylim(y.min() - 2, y.max() + 4)
  
-    # Quintile boundaries
     quintiles = x.quantile([0.2, 0.4, 0.6, 0.8])
     for q in quintiles:
         ax2.axvline(q, color="#CCCCCC", linewidth=0.6,
                     linestyle="--", zorder=1)
  
-    # Quintile labels drawn after limits are set
     y_top = y.max() + 2.0
     labels    = ["Q1", "Q2", "Q3", "Q4", "Q5"]
     positions = [55,   88,   118,  148,  200]
@@ -180,7 +174,6 @@ def make_choropleth(manhattan, map_df):
     ax2.grid(True, alpha=0.25, zorder=0)
     ax2.tick_params(labelsize=9)
  
-    # ── Overall ───────────────────────────────────────────
     fig.suptitle(
         "NYC Congestion Pricing: Equity Impact on Ride-Hailing\n"
         "Congestion Relief Zone  |  January–June 2025",

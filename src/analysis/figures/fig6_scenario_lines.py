@@ -1,9 +1,3 @@
-"""
-src/analysis/figures/fig6_scenario_lines.py
-Figure 6 — Scenario forecast line chart (replaces table image)
-Run: python -m src.analysis.figures.fig6_scenario_lines
-"""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,12 +30,11 @@ def main():
     base = pd.read_parquet(PROC / "phase5/forecast_base.parquet")
     sens = pd.read_parquet(PROC / "phase5/forecast_2x.parquet")
 
-    # Build month-level dates
     base["date"] = pd.to_datetime(
         base["year"].astype(str) + "-" +
         base["month_of_year"].astype(str).str.zfill(2) + "-01"
     )
-    sens["date"] = base["date"].values  # same shape
+    sens["date"] = base["date"].values 
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
@@ -56,7 +49,6 @@ def main():
                     color=SCENARIO_COLORS[sc],
                     linewidth=2.0, label=label)
 
-            # 2x elasticity as dashed — only for Scenario B
             if sc == "B_rise_15":
                 df2 = sens[sens["scenario"] == sc + "_2x"].sort_values("date")
                 y2  = df2[metric].values / 1e6
@@ -65,7 +57,6 @@ def main():
                         linewidth=1.2, linestyle=":",
                         label="B (2\u00d7 elasticity)")
 
-        # Scenario B toll change marker
         toll_change = pd.Timestamp("2027-01-01")
         ax.axvline(toll_change, color="#E24B4A",
                    linewidth=1.0, linestyle="--", alpha=0.5)
@@ -74,7 +65,6 @@ def main():
                 "Scenario B\ntoll rises",
                 fontsize=7.5, color="#E24B4A", va="bottom")
 
-        # C pause shading
         ax.axvspan(pd.Timestamp("2025-07-01"),
                    pd.Timestamp("2026-01-01"),
                    alpha=0.07, color="#EF9F27")

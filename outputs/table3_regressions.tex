@@ -1,0 +1,33 @@
+\begin{table}[htbp]
+\centering
+\caption{Regression Results: Equity OLS (1) and Platform DiD (2)}
+\label{tab:regressions}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Variable} & \textbf{(1) Equity OLS} & \textbf{(2) Platform DiD} \\
+ & \textit{Dep: effect\_pct} & \textit{Dep: log(trips)} \\
+\midrule
+log(Median income) & $-3.060^{*}$ &  \\
+ & $(1.375)$ &  \\
+Has subway (0/1) & $1.774$ &  \\
+ & $(0.915)$ &  \\
+DiD ($\tau$: Lyft $\times$ Post) &  & $0.151^{***}$ \\
+ &  & $(0.035)$ \\
+Lyft indicator &  & $-1.074^{***}$ \\
+ &  & $(0.031)$ \\
+Post-treatment &  & $-0.071^{**}$ \\
+ &  & $(0.022)$ \\
+Intercept & $24.333$ & $14.052^{***}$ \\
+ & $(16.173)$ & $(0.026)$ \\
+\midrule
+Borough FE & Yes & No \\
+Month FE & No & Yes \\
+HC3 standard errors & Yes & Yes \\
+$N$ & 63 zones & 262 week-platform \\
+$R^2$ & 0.127 & 0.881 \\
+
+\bottomrule
+\multicolumn{999}{l}{\footnotesize HC3 heteroskedasticity-robust standard errors in parentheses. $^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$. (1) Dep. var: HVFHV trip change vs counterfactual (\\%). 63 CRZ zones, Jan--Jun 2025 vs Jan--Jun 2024. (2) Dep. var: log weekly CRZ trips. Treated = Lyft (\$1.50 credit, Jan 2025); Control = Uber. Pre-period: Jan 2023 -- Dec 2024.}\\
+\end{tabular}
+\end{table}

@@ -1,9 +1,3 @@
-"""
-src/analysis/figures/fig7_counterfactual.py
-Figure 7 — Actual vs counterfactual weekly HVFHV trips
-Run: python -m src.analysis.figures.fig7_counterfactual
-"""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -64,17 +58,14 @@ def main():
 
     fig, ax = plt.subplots(figsize=(12, 5.5))
 
-    # Pre-treatment actual
     pre = agg[agg["week_start"] < TREATMENT_DATE]
     ax.plot(pre["week_start"], pre["trip_count"] / 1e6,
             color="#B4B2A9", linewidth=1.4, label="Actual (pre-treatment)")
 
-    # Post-treatment actual
     post = agg[agg["week_start"] >= TREATMENT_DATE]
     ax.plot(post["week_start"], post["trip_count"] / 1e6,
             color="#1A252F", linewidth=2.0, label="Actual (post-treatment)")
 
-    # Counterfactual + CI band
     ax.fill_between(paired["week_start"],
                     paired["cf_lo"] / 1e6,
                     paired["cf_hi"] / 1e6,
@@ -83,18 +74,15 @@ def main():
             color="#1D9E75", linewidth=1.8, linestyle="--",
             label="Counterfactual (2024 \u00d7 1.034 baseline)")
 
-    # Lyft credit shading
     ax.axvspan(TREATMENT_DATE, LYFT_CREDIT_END,
                alpha=0.08, color="#FF5722", label="Lyft credit (Jan 2025)")
 
-    # Treatment date line + label
     ax.axvline(TREATMENT_DATE, color="#3d3d3a",
                linewidth=1.4, linestyle="--", zorder=5)
     ymax = agg["trip_count"].max() / 1e6
     ax.text(TREATMENT_DATE + pd.Timedelta(days=3), ymax * 0.97,
             "CBDTP\nJan 5, 2025", fontsize=8, color="#3d3d3a", va="top")
 
-    # Arrow annotating the gap
     mid = paired.iloc[len(paired)//3]
     actual_mid = agg[agg["week_start"] == mid["week_start"]]["trip_count"]
     if len(actual_mid):

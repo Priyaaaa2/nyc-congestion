@@ -82,12 +82,12 @@ def merge_weather(panel: pd.DataFrame) -> pd.DataFrame:
     print("\nMerging weather...")
     wx = pd.read_csv(WEATHER_CSV, parse_dates=["DATE"])
 
-    # NOAA values are in tenths — divide by 10
+    
     for col in ["TMAX", "TMIN", "PRCP"]:
         if col in wx.columns:
             wx[col] = wx[col] / 10.0
 
-    # Aggregate daily → weekly
+
     wx["week_start"] = wx["DATE"].dt.to_period("W").dt.start_time
     wx_weekly = wx.groupby("week_start").agg(
         avg_tmax   = ("TMAX", "mean"),
@@ -97,7 +97,6 @@ def merge_weather(panel: pd.DataFrame) -> pd.DataFrame:
         max_snwd   = ("SNWD", "max"),
     ).reset_index()
 
-    # Snow flag: any snow depth > 50mm that week
     wx_weekly["snow_week"] = (wx_weekly["max_snwd"] > 50).astype(int)
 
     panel["week_start"] = pd.to_datetime(panel["week_start"])
@@ -115,13 +114,11 @@ def add_time_features(panel: pd.DataFrame) -> pd.DataFrame:
     panel["month"]      = panel["week_start"].dt.month
     panel["quarter"]    = panel["week_start"].dt.quarter
 
-    # Ordinal week number from start of dataset (for trend)
     min_week      = panel["week_start"].min()
     panel["week_num"] = (
         (panel["week_start"] - min_week).dt.days // 7
     ).astype(int)
 
-    # Holiday flag (major US holidays)
     holidays = pd.to_datetime([
         "2022-01-17","2022-02-21","2022-05-30","2022-07-04",
         "2022-09-05","2022-11-24","2022-12-26",

@@ -11,7 +11,6 @@ DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 FHVHV_FILES  = sorted(pathlib.Path(config.TLC_FHVHV_DIR).glob("*.parquet"))
 YELLOW_FILES = sorted(pathlib.Path(config.TLC_YELLOW_DIR).glob("*.parquet"))
  
-# CRZ zone list as SQL array literal
 CRZ_SQL = str(config.CRZ_ZONES).replace("[", "[").replace("]", "]")
  
 print(f"FHVHV files  : {len(FHVHV_FILES)}")
@@ -130,14 +129,12 @@ def main():
     print("  TLC INGESTION PIPELINE v3 — CRZ trips only")
     print("="*60)
  
-    # Delete old DB to free space first
     if DB_PATH.exists():
         DB_PATH.unlink()
         print(f"Deleted old DB — freed space")
  
     con = duckdb.connect(str(DB_PATH))
- 
-    # Limit DuckDB temp space usage
+
     con.execute("SET temp_directory='/tmp/duckdb_tmp'")
     con.execute("SET memory_limit='4GB'")
  

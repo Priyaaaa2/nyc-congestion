@@ -23,32 +23,26 @@ def load_zone_panel() -> pd.DataFrame:
     panel = pd.read_parquet(PANEL_PATH)
     panel["week_start"] = pd.to_datetime(panel["week_start"])
  
-    # Filter to FHVHV only (main treatment vehicle)
-    # CRZ pickup zones only
     fhvhv = panel[
         (panel["vehicle_type"] == "fhvhv") &
         (panel["in_crz"] == 1)
     ].copy()
- 
-    # Jan-Jun 2024 (pre-treatment comparison period)
+
     pre = fhvhv[
         (fhvhv["week_start"] >= "2024-01-01") &
         (fhvhv["week_start"] <  "2024-07-01")
     ].groupby("zone_id")["trip_count"].sum().reset_index()
     pre.columns = ["zone_id", "trips_2024"]
- 
-    # Jan-Jun 2025 (post-treatment)
+
     post = fhvhv[
         (fhvhv["week_start"] >= "2025-01-01") &
         (fhvhv["week_start"] <  "2025-07-01")
     ].groupby("zone_id")["trip_count"].sum().reset_index()
     post.columns = ["zone_id", "trips_2025"]
  
-    # Merge
     zone_df = pre.merge(post, on="zone_id", how="inner")
     zone_df = zone_df[zone_df["zone_id"] != 194]
  
-    # YoY baseline from Phase 1: FHVHV grew +3.4% pre-toll
     BASELINE_GROWTH = 0.034
     zone_df["cf_trips"] = zone_df["trips_2024"] * (1 + BASELINE_GROWTH)
     zone_df["effect_abs"] = zone_df["trips_2025"] - zone_df["cf_trips"]
@@ -96,7 +90,6 @@ def run_equity_regression(zone_df: pd.DataFrame):
  
     df = zone_df.dropna(subset=["median_income", "effect_pct"]).copy()
  
-    # Borough fixed effects
     formula = (
         "effect_pct ~ log_income + has_subway + C(Borough)"
     )

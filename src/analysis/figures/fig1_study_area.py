@@ -1,9 +1,3 @@
-"""
-src/analysis/figures/fig1_study_area.py
-Figure 1 — Study area map: Manhattan CRZ zones
-Run: python -m src.analysis.figures.fig1_study_area
-"""
-
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -34,14 +28,12 @@ def main():
     fig, axes = plt.subplots(1, 2, figsize=(13, 9),
                               gridspec_kw={"width_ratios": [1, 1.4]})
 
-    # ── LEFT: full NYC context map ────────────────────────
     ax1 = axes[0]
     zones.plot(ax=ax1, color="#E8E6DE", edgecolor="#B4B2A9",
                linewidth=0.3)
     zones[zones["is_crz"]].plot(ax=ax1, color="#378ADD",
                                 edgecolor="white", linewidth=0.4,
                                 alpha=0.85)
-    # Borough labels
     borough_centroids = {
         "Manhattan": (-73.971, 40.783),
         "Brooklyn":  (-73.944, 40.650),
@@ -59,7 +51,6 @@ def main():
     ax1.set_title("NYC context — CRZ in blue",
                   fontsize=10, pad=6)
 
-    # Inset box around Manhattan CRZ
     from matplotlib.patches import FancyArrowPatch
     ax1.add_patch(plt.Rectangle(
         (-74.03, 40.68), 0.13, 0.20,
@@ -67,20 +58,16 @@ def main():
         linewidth=1.5, linestyle="--"
     ))
 
-    # ── RIGHT: Manhattan CRZ detail ───────────────────────
     ax2 = axes[1]
     manhattan = zones[zones["borough"] == "Manhattan"]
     crz       = zones[zones["is_crz"]]
 
-    # All Manhattan zones — light grey
     manhattan.plot(ax=ax2, color="#F0EEE6",
                    edgecolor="#C8C6BE", linewidth=0.4)
 
-    # CRZ zones — blue fill
     crz.plot(ax=ax2, color="#378ADD",
              edgecolor="white", linewidth=0.5, alpha=0.75)
 
-    # CRZ boundary outline
     crz_union = crz.union_all()
     import geopandas as gpd2
     gpd.GeoSeries([crz_union]).plot(
@@ -88,13 +75,11 @@ def main():
         edgecolor="#1A252F", linewidth=2.0
     )
 
-    # 60th St label
     ax2.axhline(40.768, color="#3d3d3a",
                 linewidth=0.8, linestyle=":", alpha=0.6)
     ax2.text(-73.903, 40.769, "60th St (northern boundary)",
              fontsize=7.5, color="#3d3d3a", va="bottom")
 
-    # North arrow
     ax2.annotate("N", xy=(-73.902, 40.876),
                  fontsize=11, ha="center", fontweight="bold",
                  color="#3d3d3a")
@@ -112,7 +97,6 @@ def main():
         fontsize=10, pad=6
     )
 
-    # Zone count annotation
     ax2.text(-73.998, 40.685,
              f"{len(crz)} CRZ zones\n"
              f"63 zones with equity data",

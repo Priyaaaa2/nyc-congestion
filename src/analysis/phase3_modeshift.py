@@ -112,7 +112,6 @@ def load_mta_zone_change(subway_map: pd.DataFrame) -> pd.DataFrame:
  
     print(f"  MTA rows loaded: {len(mta):,}")
  
-    # Keep one station name per complex_id
     station_names = mta.groupby("station_complex_id")\
                        ["station_complex"].first().reset_index()
  
@@ -141,7 +140,6 @@ def load_mta_zone_change(subway_map: pd.DataFrame) -> pd.DataFrame:
         mta_change["mta_2025"] - mta_change["mta_cf"]
     )
  
-    # ── Join via GTFS Stop ID → Complex ID bridge ────────
     stations = pd.read_csv(config.MTA_STATIONS)
     stations = stations[["GTFS Stop ID", "Complex ID"]].copy()
     stations.columns = ["gtfs_stop_id", "complex_id"]

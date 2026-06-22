@@ -1,10 +1,3 @@
-"""
-src/analysis/figures/fig2_timeline.py
-Figure 2 — Data and event timeline (v5)
-Okabe-Ito colorblind-safe palette, fixed boxstyle, no figure number prefix.
-Run: python -m src.analysis.figures.fig2_timeline
-"""
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import pandas as pd
@@ -17,7 +10,6 @@ import config
 OUT_DIR = pathlib.Path(config.OUTPUTS)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Okabe-Ito colorblind-safe palette
 BLUE     = "#0072B2"
 ORANGE   = "#E69F00"
 GREEN    = "#009E73"
@@ -77,7 +69,6 @@ def main():
     ax.set_ylim(0, n_rows + Y_MARGIN + 1)
     ax.set_axis_off()
 
-    # ── Bars ─────────────────────────────────────────────
     drawn_right = set()
     for name, s, e, color, row in sources:
         x0 = xd(s)
@@ -104,7 +95,6 @@ def main():
                     color="#6E6E6E")
             drawn_right.add(name)
 
-    # ── Event lines ───────────────────────────────────────
     y_top = n_rows + 0.3
     y_bot = 0.6
 
@@ -128,7 +118,6 @@ def main():
                 color=color,
                 fontweight="bold" if bold else "normal")
 
-    # Lyft credit shading
     ax.axvspan(
         xd("2025-01-05"), xd("2025-01-31"),
         ymin=y_bot / (n_rows + Y_MARGIN + 1),
@@ -136,7 +125,6 @@ def main():
         alpha=0.10, color=ORANGE, zorder=1
     )
 
-    # ── X-axis ticks ──────────────────────────────────────
     tick_dates = pd.date_range("2022-01-01", "2025-09-01", freq="6MS")
     for td in tick_dates:
         xv = xd(td)
@@ -147,7 +135,6 @@ def main():
                 ha="center", va="top",
                 fontsize=8, color="#333333")
 
-    # Horizontal baseline
     ax.plot(
         [xd("2022-01-01"), xd("2025-07-01")],
         [y_bot - 0.05, y_bot - 0.05],
