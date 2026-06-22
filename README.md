@@ -101,8 +101,28 @@ nyc-congestion/
 
 ---
 
-## Contact
+## Citation
+
+If you use this work, please cite:
+
+```text
+Priyanka Mysore Krishna. (2026).
+Equity, Elasticity, and Mode Shift: Zone-Level Effects of NYC's Congestion Relief Zone on High-Volume For-Hire Vehicle Demand.
+Zenodo.
+https://doi.org/10.5281/zenodo.20802038
+```
+
+## Paper
+
+* DOI: https://doi.org/10.5281/zenodo.20802038
+* Zenodo Record: https://zenodo.org/records/20802038
+
+## Author
 
 Priyanka Mysore Krishna
 
-[priyankamk2903@gmail.com](mailto:priyankamk2903@gmail.com)
+## License
+
+Code in this repository is licensed under the MIT License.
+
+The paper is licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).
